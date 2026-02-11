@@ -1,5 +1,5 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
+import Navbar from '../component/Navbar'
 import { FaPlus } from 'react-icons/fa'
 import { MdDelete, MdEdit } from 'react-icons/md'
 import './Dashboard.css'
