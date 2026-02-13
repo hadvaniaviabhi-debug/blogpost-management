@@ -9,66 +9,66 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Navbar from "../components/Navbar";
+import Navbar from "../component/Navbar";
 import "./CreatePost.css";
-import { type } from "server/reply";
 
 const CreatePost = () => {
   const navigate = useNavigate();
-  
-  // Get current user from localStorage
+  const fileInput = useRef(null);
+
+  // Get current user
   const authData = JSON.parse(localStorage.getItem("authData") || "{}");
   const defaultAuthor = authData?.username || "User";
-  
-  
+
   const [formData, setFormData] = useState({
     title: "",
-    author: authData?.username ,// Automatically set from dashboard username
+    author: defaultAuthor,
     description: "",
     imageUrl: "",
-    imageType:'url'
   });
-  const fileInput =useRef(null);
+
   const [imageTab, setImageTab] = useState("url");
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Handle normal input change
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
-  const handleFileTypeChange=(type)=>{
-    setFormData
-  }
 
+  // Handle URL image
   const handleImageUrlChange = (e) => {
     const url = e.target.value;
     setFormData({ ...formData, imageUrl: url });
-    if (url) {
-      setImagePreview(url);
-    }
+    setImagePreview(url || null);
   };
 
-
+  // Handle File Upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setFormData({ ...formData, imageUrl: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+      setFormData({ ...formData, imageUrl: reader.result });
+    };
+    reader.readAsDataURL(file);
   };
 
+  // Remove Image
   const removeImage = () => {
     setImagePreview(null);
     setFormData({ ...formData, imageUrl: "" });
+    if (fileInput.current) {
+      fileInput.current.value = "";
+    }
   };
 
+  // Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -76,9 +76,11 @@ const CreatePost = () => {
     try {
       const newPost = {
         title: formData.title,
-        author: formData.author || defaultAuthor, // Use form author or default
+        author: formData.author,
         description: formData.description,
-        image: formData.imageUrl || "https://via.placeholder.com/600x400",
+        image:
+          formData.imageUrl ||
+          "https://via.placeholder.com/600x400",
         date: new Date().toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
@@ -95,37 +97,38 @@ const CreatePost = () => {
         body: JSON.stringify(newPost),
       });
 
-      if (response.ok) {
-        toast.success("Post created successfully!");
-        navigate("/dashboard");
-      } else {
-        throw new Error("Failed to create post");
-      }
+      if (!response.ok) throw new Error();
+
+      toast.success("Post created successfully!");
+      navigate("/dashboard");
     } catch (error) {
-      console.error("Error creating post:", error);
       toast.error("Failed to create post");
     } finally {
       setLoading(false);
     }
   };
 
+  // Clear Form
   const handleClearForm = () => {
     setFormData({
       title: "",
-      author: defaultAuthor, // Reset to default author instead of empty string
+      author: defaultAuthor,
       description: "",
       imageUrl: "",
     });
     setImagePreview(null);
+    setImageTab("url");
     toast.info("Form cleared");
   };
 
   return (
     <div className="create-post-page">
-      <Navbar onLogout={() => {
-        localStorage.removeItem("loginData");
-        navigate("/login");
-      }} />
+      <Navbar
+        onLogout={() => {
+          localStorage.removeItem("authData");
+          navigate("/login");
+        }}
+      />
 
       <div className="create-post-container">
         <header className="form-header">
@@ -135,6 +138,8 @@ const CreatePost = () => {
 
         <div className="post-form-card">
           <form onSubmit={handleSubmit}>
+            
+            {/* Title */}
             <div className="form-group">
               <label>Post Title</label>
               <div className="input-wrapper">
@@ -145,12 +150,12 @@ const CreatePost = () => {
                   value={formData.title}
                   onChange={handleChange}
                   className="form-control"
-                  placeholder="Enter a catchy title..."
                   required
                 />
               </div>
             </div>
 
+            {/* Author */}
             <div className="form-group">
               <label>Author Name</label>
               <div className="input-wrapper">
@@ -161,14 +166,11 @@ const CreatePost = () => {
                   value={formData.author}
                   onChange={handleChange}
                   className="form-control"
-                  placeholder="Your name"
                 />
               </div>
-              <small className="author-hint">
-                Author name is automatically set to your username. You can change it if needed.
-              </small>
             </div>
 
+            {/* Description */}
             <div className="form-group">
               <label>Description</label>
               <textarea
@@ -176,58 +178,55 @@ const CreatePost = () => {
                 value={formData.description}
                 onChange={handleChange}
                 className="form-control"
-                placeholder="What's on your mind? Write your story here."
                 required
-              ></textarea>
+              />
             </div>
 
+            {/* Cover Image */}
             <div className="form-group">
               <label>Cover Image</label>
-                {!imagePreview ? (
-                    <>
-              <div className="image-source-tabs">
-                <button
-                  type="button"
-                  className={`tab-btn ${formData.imageType==='url'?'active':''}`}
-                  onClick={() => setImageTab("url")}
-                >
-                  Image URL
-                </button>
-                <button
-                  type="button"
-                  className={`tab-btn ${formData.imageType==='file'?'active':''}`}
-                  onClick={() => setImageTab("upload")}
-                >
-                  Upload File
-                </button>
-              </div>
-                    </>
-                  )
-                }
 
-              {imageTab === "url" && (
+              {!imagePreview && (
+                <div className="image-source-tabs">
+                  <button
+                    type="button"
+                    className={`tab-btn ${imageTab === "url" ? "active" : ""}`}
+                    onClick={() => setImageTab("url")}
+                  >
+                    Image URL
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`tab-btn ${imageTab === "file" ? "active" : ""}`}
+                    onClick={() => setImageTab("file")}
+                  >
+                    Upload File
+                  </button>
+                </div>
+              )}
+
+              {imageTab === "url" && !imagePreview && (
                 <div className="input-wrapper">
                   <FaLink className="input-icon" />
                   <input
                     type="url"
-                    name="imageUrl"
                     value={formData.imageUrl}
                     onChange={handleImageUrlChange}
                     className="form-control"
-                    placeholder="Paste image URL here. (e.g. https://...)"
                   />
                 </div>
               )}
 
-              {imageTab === "upload" && (
-                <div 
+              {imageTab === "file" && !imagePreview && (
+                <div
                   className="image-upload-area"
-                  onClick={() => document.getElementById("imageUpload").click()}
+                  onClick={() => fileInput.current.click()}
                 >
                   <FaCloudUploadAlt className="upload-icon" />
-                  <p>Click to upload image from your device</p>
+                  <p>Click to upload image</p>
                   <input
-                    id="imageUpload"
+                    ref={fileInput}
                     type="file"
                     accept="image/*"
                     onChange={handleImageUpload}
@@ -238,7 +237,11 @@ const CreatePost = () => {
 
               {imagePreview && (
                 <div className="image-preview-container">
-                  <img src={imagePreview} alt="Preview" className="image-preview" />
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="image-preview"
+                  />
                   <button
                     type="button"
                     className="remove-image-btn"
@@ -250,22 +253,26 @@ const CreatePost = () => {
               )}
             </div>
 
+            {/* Buttons */}
             <div className="form-actions-row">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="submit-btn"
                 disabled={loading}
               >
-                <FaRegPaperPlane /> {loading ? "Publishing..." : "Publish Post"}
+                <FaRegPaperPlane />
+                {loading ? " Publishing..." : " Publish Post"}
               </button>
-              <button 
-                type="button" 
+
+              <button
+                type="button"
                 className="cancel-btn"
                 onClick={handleClearForm}
               >
                 Clear Form
               </button>
             </div>
+
           </form>
         </div>
       </div>

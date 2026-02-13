@@ -44,14 +44,14 @@ const Register = () => {
   if(!loginData.password.trim()){
       newErrors.password = "Phone Number is required."
     }
-    else if(loginData.password.length <= 6){
+    else if(loginData.password.length <= 3){
       newErrors.password = " Minimum 6 character required."
   }
 
   if(!loginData.Conform_pass.trim()){
       newErrors.Conform_pass = "Phone Number is required."
     }
-    else if(loginData.Conform_pass.length <= 6){
+    else if(loginData.Conform_pass.length <= 3){
       newErrors.Conform_pass = " Minimum 6 character required."
   }
   setErrors(newErrors)
