@@ -1,103 +1,136 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
-import { Link, useNavigate } from "react-router-dom";
-import {toast} from "react-toastify";
-function Login() {
-  const [logData, setLogData] = useState({
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "react-toastify";
+
+const Login = () => {
+  const navigate = useNavigate();
+  const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
 
-  const [error, setError] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  const navigate=useNavigate();
-
-  const handleChange = (e) => {
-    setLogData({
-      ...logData,
+  const handleInputChange = (e) => {
+    setLoginData({
+      ...loginData,
       [e.target.name]: e.target.value,
     });
-    setError({
-      ...error,
+
+    setErrors({
+      ...errors,
       [e.target.name]: "",
     });
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!loginData.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!loginData.password.trim()) {
+      newErrors.password = "Password is required.";
+    } else if (loginData.password.length < 6) {
+      newErrors.password = "Minimum 6 characters required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (validate()) {
-      const data = JSON.parse(localStorage.getItem("blog_rdata"));
-      if (
-        data &&
-        data.email === logData.email &&
-        data.password === logData.password
-      ) {
-        localStorage.setItem("blog_ldata", JSON.stringify(logData));
-          toast.success("done");
+      const user = JSON.parse(localStorage.getItem("authData"));
+      
+      if (user && loginData.email === user.email && loginData.password === user.password) {
+        // Store only necessary data in loginData
+        const loginSession = {
+          email: loginData.email,
+          loginTime: new Date().toISOString(),
+        };
+        localStorage.setItem("loginData", JSON.stringify(loginSession));
+        toast.success("Login successful!");
         navigate("/dashboard");
       } else {
-        alert("Email And Password Not Match");
+        toast.error("Invalid email or password");
       }
     }
   };
 
-  const validate = () => {
-    const newError = {};
-
-    if (!logData.email.trim()) {
-      newError.email = "Email is Required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(logData.email)) {
-      newError.email = "Invalide Email formate.";
-    }
-    if (!logData.password.trim()) {
-      newError.password = "Password is Required.";
-    } else if (logData.password.length < 6) {
-      newError.password = "Minimum 6 Character Required.";
-    }
-
-    setError(newError);
-    return Object.keys(newError).length === 0;
-  };
-
   return (
-    <div className="register-container">
-      <h1>Welcome </h1>
-      <p>Join Us And Start Our Journey</p>
+    <div className="form-container">
+      <h1 className="form-title">Welcome Back</h1>
+      <p align="center">Please login to your account</p>
 
-      <form action="" onSubmit={handleSubmit}>
-        <div>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
           <label htmlFor="email">Email Address</label>
           <input
             type="email"
-            name="email"
             id="email"
-            value={logData.email}
-            placeholder="Enter Yoyr Email Address"
-            onChange={handleChange}
+            name="email"
+            value={loginData.email}
+            placeholder="Enter your email"
+            onChange={handleInputChange}
+            className={errors.email ? "input-error" : ""}
           />
-          {error.email && <span className="error-msg">{error.email}</span>}
+          {errors.email && <span className="error-msg">{errors.email}</span>}
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={logData.password}
-            onChange={handleChange}
-          />
-          {error.password && (
-            <span className="error-msg">{error.password}</span>
-          )}
+          <div style={{ position: "relative" }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              value={loginData.password}
+              placeholder="Enter your password"
+              onChange={handleInputChange}
+              className={errors.password ? "input-error" : ""}
+              style={{ paddingRight: "40px" }}
+            />
+            <span
+              onClick={togglePasswordVisibility}
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                fontSize: "18px",
+                color: "#666",
+              }}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
+          {errors.password && <span className="error-msg">{errors.password}</span>}
         </div>
 
-        <button type="submit">Login</button>
+        <button type="submit" className="btn-primary">
+          Login
+        </button>
       </form>
-            <p>Don't have Account??<Link to="/register">Register</Link></p>
 
+      <p className="link-text">
+        Don't have an account? <Link to="/register">Register here</Link>
+      </p>
     </div>
   );
-}
+};
 
 export default Login;

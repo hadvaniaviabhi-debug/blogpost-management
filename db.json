@@ -1,0 +1,60 @@
+{
+  "posts": [
+    {
+      "id": "4b4b",
+      "title": "Title 1",
+      "description": "Lorem Ipsum is simply dummy text of the priority",
+      "author": "Goswami Manav",
+      "image": "https://avatars.mds.yandex.net/i?id=1266f1bb307abbb7a8629cbacb0241d0cec08451-5476313-images-thumbs&n=13",
+      "createdat": "2026-02-06T10:41:07.837Z"
+    },
+    {
+      "id": "2",
+      "title": "Title 1",
+      "description": "Lorem Ipsum is simply dummy text of the priority part of this",
+      "author": "Goswami ManavBharthi",
+      "image": "https://avatars.mds.yandex.net/i?id=f657526b18bc6233b8c37d9cfda2203b65625df9-5427846-images-thumbs&n=13",
+      "createdat": "2026-02-06T10:41:07.837Z"
+    },
+    {
+      "id": "3",
+      "title": "Title 1",
+      "description": "Lorem Ipsum is simply dummy text of the priority",
+      "author": "Goswami ManavBharthi",
+      "image": "https://avatars.mds.yandex.net/i?id=50911ce32130d842407986fa2b1ffda38c13f475-5505749-images-thumbs&n=13",
+      "createdat": "2026-02-06T10:41:07.837Z"
+    },
+    {
+      "id": "4",
+      "title": "Title 1",
+      "description": "Lorem Ipsum is simply dummy text of the priority",
+      "author": "Goswami ManavBharthi",
+      "image": "https://avatars.mds.yandex.net/i?id=d69cc11ba9f30aa0980c25b6245ea1b47fa67713-3922135-images-thumbs&n=13",
+      "createdat": "2026-02-06T10:41:07.837Z"
+    },
+    {
+      "id": "5",
+      "title": "Title 1",
+      "description": "Lorem Ipsum is simply dummy text of the priority",
+      "author": "Goswami ManavBharthi",
+      "image": "https://avatars.mds.yandex.net/i?id=ed63ed1ab3d473a25a2303c80afde9836b0d5c0b-4347438-images-thumbs&n=13",
+      "createdat": "2026-02-06T10:41:07.837Z"
+    },
+    {
+      "id": "6",
+      "title": "Title 1",
+      "description": "Lorem Ipsum is simply dummy text of the priority",
+      "author": "Goswami ManavBharthi",
+      "image": "https://avatars.mds.yandex.net/i?id=7e2a4ae4564fda2f8f0b394ef0a8947a3b7ca759-10637407-images-thumbs&n=13",
+      "createdat": "2026-02-06T10:41:07.837Z"
+    },
+    {
+      "id": "7",
+      "title": "Title 1",
+      "description": "Lorem Ipsum is simply dummy text of the priority",
+      "author": "Goswami ManavBharthi",
+      "image": "https://avatars.mds.yandex.net/i?id=fae11c3256fdf6447db747b2a6c9fed41a9c3bc8-9182192-images-thumbs&n=13 ",
+      "createdat": "2026-02-06T10:41:07.837Z"
+    }
+  ]
+}

@@ -1,31 +1,26 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
 import {
   createBrowserRouter,
   Navigate,
   RouterProvider,
 } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import AuthGuard from "./auth/AuthGuard";
+import "./App.css";
+import Dashboard from "./pages/Dashboard.jsx";
+import Login from "./Pages/Login.jsx";
+import Register from "./Pages/Register.jsx";
+import AuthGuard from "./auth/AuthGuard.jsx";
 import { ToastContainer } from "react-toastify";
-
-const DefaultRoute = () => {
-  const loginData = JSON.parse(localStorage.getItem("loginData"));
-  if (loginData) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  return <Navigate to="/login" replace />;
-};
+import "react-toastify/dist/ReactToastify.css";
+import CreatePost from "./pages/CreatePost.jsx";
 
 function App() {
   const route = createBrowserRouter([
     {
       path: "/",
-      element: <DefaultRoute />,
+      element: (
+        <AuthGuard required={false}>
+          <DefaultRoute />
+        </AuthGuard>
+      ),
     },
     {
       path: "/login",
@@ -51,10 +46,35 @@ function App() {
         </AuthGuard>
       ),
     },
+    
+    {
+      path: "/create-post",
+      element: (
+        <AuthGuard required={true}>
+        <CreatePost/>
+        </AuthGuard>
+      ),
+    },
+    {
+      path: "*",
+      element: (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "100px",
+            color: "white",
+          }}
+        >
+          <h1>404 - Page Not Found</h1>
+          <p>The page you are looking for does not exist.</p>
+        </div>
+      ),
+    },
   ]);
 
   return (
     <>
+      <RouterProvider router={route} />
       <ToastContainer
         position="top-right"
         autoClose={1000}
@@ -67,10 +87,12 @@ function App() {
         pauseOnHover
         theme="light"
       />
-
-      <RouterProvider router={route} />
     </>
   );
 }
+
+const DefaultRoute = () => {
+  return <Navigate to="/dashboard" replace />;
+};
 
 export default App;
