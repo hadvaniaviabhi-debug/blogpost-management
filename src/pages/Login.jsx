@@ -91,35 +91,26 @@ const Login = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <div style={{ position: "relative" }}>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              name="password"
-              value={loginData.password}
-              placeholder="Enter your password"
-              onChange={handleInputChange}
-              className={errors.password ? "input-error" : ""}
-              style={{ paddingRight: "40px" }}
-            />
-            <span
-              onClick={togglePasswordVisibility}
-              style={{
-                position: "absolute",
-                right: "12px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                fontSize: "18px",
-                color: "#666",
-              }}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
-          </div>
-          {errors.password && <span className="error-msg">{errors.password}</span>}
-        </div>
+  <label htmlFor="password">Password</label>
+  <div className="password-wrapper">
+    <input
+      type={showPassword ? "text" : "password"}
+      id="password"
+      name="password"
+      value={loginData.password}
+      placeholder="Enter your password"
+      onChange={handleInputChange}
+      className={errors.password ? "input-error" : ""}
+    />
+    <span
+      className="toggle-password"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? "🐵" : "🙈"}
+    </span>
+  </div>
+  {errors.password && <span className="error-msg">{errors.password}</span>}
+</div>
 
         <button type="submit" className="btn-primary">
           Login

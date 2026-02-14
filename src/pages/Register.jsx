@@ -12,6 +12,8 @@ const Register = () => {
     password: "",
     Conform_pass: ""
   });
+  const [showConformPassword, setShowConformPassword] = useState(false);
+
   const [errors, setErrors] = useState({})
   const navigate = useNavigate()
 
@@ -127,31 +129,47 @@ const Register = () => {
           {errors.phone && <span className="error-msg">{errors.phone}</span>}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={loginData.password}
-            placeholder="Enter your password"
-            onChange={handleInputChange}
-          />
-          {errors.password && <span className="error-msg">{errors.password}</span>}
-        </div>
+       <div className="form-group">
+  <label htmlFor="Conform_pass">Conform Password</label>
+  <div className="password-wrapper">
+    <input
+      type={showConformPassword ? "text" : "password"}
+      id="Conform_pass"
+      name="Conform_pass"
+      value={loginData.Conform_pass}
+      placeholder="Enter your password"
+      onChange={handleInputChange}
+    />
+    <span
+      className="toggle-password"
+      onClick={() => setShowConformPassword(!showConformPassword)}
+    >
+      {showConformPassword ? "🐵" : "🙈"}
+    </span>
+  </div>
+  {errors.Conform_pass && <span className="error-msg">{errors.Conform_pass}</span>}
+</div>
 
           <div className="form-group">
-          <label htmlFor="Conform_pass">Conform Password</label>
-          <input
-            type="password"
-            id="Conform_pass"
-            name="Conform_pass"
-            value={loginData.Conform_pass}
-            placeholder="Enter your password"
-            onChange={handleInputChange}
-          />
-          {errors.Conform_pass && <span className="error-msg">{errors.Conform_pass}</span>}
-        </div>
+  <label htmlFor="Conform_pass">Conform Password</label>
+  <div className="password-wrapper">
+    <input
+      type={showConformPassword ? "text" : "password"}
+      id="Conform_pass"
+      name="Conform_pass"
+      value={loginData.Conform_pass}
+      placeholder="Enter your password"
+      onChange={handleInputChange}
+    />
+    <span
+      className="toggle-password"
+      onClick={() => setShowConformPassword(!showConformPassword)}
+    >
+      {showConformPassword ? "🐵" : "🙈"}
+    </span>
+  </div>
+  {errors.Conform_pass && <span className="error-msg">{errors.Conform_pass}</span>}
+</div>
 
         <button type="submit" className="btn-primary">
           Register
