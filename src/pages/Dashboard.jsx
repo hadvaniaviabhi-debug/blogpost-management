@@ -96,7 +96,7 @@ const Dashboard = () => {
         <section className="posts-section">
           <div className="section-header">
             <h2 className="section-title">Recent Feed</h2>
-            <button className="create-shortcut-btn">
+            <button className="create-shortcut-btn"  onClick={() => navigate("/create-post")}>
               <FaPlus /> New Post
             </button>
           </div>
@@ -117,7 +117,8 @@ const Dashboard = () => {
                     <div className="post-actions">
                       <button
                         className="action-btn edit-btn"
-                        title="Edit Post"
+                        title="Edit Post" 
+                        onClick={() => navigate(`/edit-post/${post.id}`)}
                       >
                         <MdEdit size={22} color="#ffffff" />
                       </button>

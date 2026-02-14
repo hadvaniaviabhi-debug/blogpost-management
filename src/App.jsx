@@ -6,11 +6,12 @@ import {
 import "./App.css";
 import Dashboard from "./pages/Dashboard.jsx";
 import Login from "./Pages/Login.jsx";
-import Register from "./Pages/Register.jsx";
+import Register from "./pages/Register.jsx";
 import AuthGuard from "./auth/AuthGuard.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CreatePost from "./pages/CreatePost.jsx";
+import EditPost from "./pages/Editpost.jsx"; // ✅ Added
 
 function App() {
   const route = createBrowserRouter([
@@ -46,12 +47,19 @@ function App() {
         </AuthGuard>
       ),
     },
-    
     {
       path: "/create-post",
       element: (
         <AuthGuard required={true}>
-        <CreatePost/>
+          <CreatePost />
+        </AuthGuard>
+      ),
+    },
+    {
+      path: "/edit-post/:id", // ✅ Dynamic Route
+      element: (
+        <AuthGuard required={true}>
+          <EditPost />
         </AuthGuard>
       ),
     },

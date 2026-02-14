@@ -108,7 +108,7 @@ const Register = () => {
             id="email"
             name="email"
             value={loginData.email}
-            placeholder="Enter your email"
+            placeholder="Enter your Email"
             onChange={handleInputChange}
           />
           {errors.email && <span className="error-msg">{errors.email}</span>}
