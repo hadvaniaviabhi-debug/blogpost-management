@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { FaBlog, FaHome, FaPlusSquare, FaSignOutAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "./Navbar.css";
+import { MdAnalytics } from "react-icons/md";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -39,6 +40,14 @@ const Navbar = () => {
             }
           >
             <FaPlusSquare className="nav-icon" /> Create Post
+          </NavLink>
+           <NavLink 
+            to="/Analytics" 
+            className={({ isActive }) => 
+              isActive ? "navbar-item active" : "navbar-item"
+            }
+          >
+            <MdAnalytics className="nav-icon" /> Analytics
           </NavLink>
         </div>
 

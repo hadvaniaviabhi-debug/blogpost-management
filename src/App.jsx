@@ -12,6 +12,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CreatePost from "./pages/CreatePost.jsx";
 import EditPost from "./pages/Editpost.jsx"; // ✅ Added
+import PostDetails from "./pages/PostDetails.jsx";
+import Analytics from "./pages/Analytics.jsx";
 
 function App() {
   const route = createBrowserRouter([
@@ -63,6 +65,24 @@ function App() {
         </AuthGuard>
       ),
     },
+     {
+      path: "/post-details/:postId", // ✅ Dynamic Route
+      element: (
+        <AuthGuard required={true}>
+          <PostDetails  />
+        </AuthGuard>
+      ),
+    },
+
+ {
+      path: "/analytics", // ✅ Dynamic Route
+      element: (
+        <AuthGuard required={true}>
+          <Analytics  />
+        </AuthGuard>
+      ),
+    },
+    
     {
       path: "*",
       element: (
