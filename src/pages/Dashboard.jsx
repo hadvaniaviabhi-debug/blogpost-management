@@ -148,7 +148,7 @@ const Dashboard = () => {
                     <p className="post-card-description">
                       {post.description || post.content || post.excerpt}
                     </p>
-                    <button className="read-more-btn" onClick={handleClick}>Read More</button>
+                    <button className="read-more-btn" onClick={()=>handleClick(post.id)}>Read More</button>
                   </div>
                 </div>
               ))

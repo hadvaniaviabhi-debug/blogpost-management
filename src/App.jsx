@@ -66,7 +66,7 @@ function App() {
       ),
     },
      {
-      path: "/post-details/:postId", // ✅ Dynamic Route
+      path: "/post-details/:id", // ✅ Dynamic Route
       element: (
         <AuthGuard required={true}>
           <PostDetails  />
