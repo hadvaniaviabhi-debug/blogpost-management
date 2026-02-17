@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../component/Navbar";
 import "./Analytics.css";
 import {
@@ -14,8 +14,19 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { toast } from "react-toastify"; // Assuming you are using react-toastify for notifications
 
 const Analytics = () => {
+  const [posts, setPosts] = useState([]); // State for posts
+  const [loading, setLoading] = useState(false); // State for loading state
+  const [currentPage, setCurrentPage] = useState(1); // State for current page
+  const postsPerPage = 4; // Define how many posts per page
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Placeholder data for chart
   const chartData = [
     { name: "Admin", posts: 5 },
     { name: "User", posts: 3 },
@@ -28,9 +39,52 @@ const Analytics = () => {
     { label: "Author", key: "author" },
     { label: "Title", key: "title" },
     { label: "Date", key: "createdAt" },
+    { label: "Action", key: "action" },
   ];
 
   const COLORS = ["#0088fe", "#00d49f", "#ffbb28", "#ff8042"];
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:3000/posts");
+      const data = await response.json();
+      setPosts(data);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      toast.error("Failed to fetch posts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate posts per author
+  const authorStats = posts.reduce((acc, post) => {
+    const author = post.author || 'unknown';
+    acc[author] = (acc[author] || 0) + 1;
+    return acc;
+  }, {});
+
+  const chartDataUpdated = Object.keys(authorStats).map((author) => ({
+    name: author,
+    posts: authorStats[author],
+  }));
+
+  // Placeholder functions for edit and delete
+  const handleEdit = (id) => {
+    console.log("Edit post with ID:", id);
+    // You can implement the actual logic here, e.g., navigate to an edit form
+  };
+
+  const handleDelete = (id) => {
+    console.log("Delete post with ID:", id);
+    // You can implement the actual delete logic here, e.g., making an API call to delete the post
+  };
+
+  // Fetch posts when the component mounts
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   return (
     <div className="analytics-page">
@@ -47,17 +101,13 @@ const Analytics = () => {
             <h3>Posts per Author</h3>
             <div className="chart-wrapper">
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
+                <BarChart data={chartDataUpdated}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar
-                    dataKey="posts"
-                    fill="#8884d8"
-                    name="Number of Posts"
-                  />
+                  <Bar dataKey="posts" fill="#8884d8" name="Number of Posts" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -70,19 +120,17 @@ const Analytics = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={chartData}
+                    data={chartDataUpdated}
                     cx="50%"
                     cy="50%"
+                    labelLine={false}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="posts"
-                    label
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
-                    {chartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
+                    {chartDataUpdated.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -106,35 +154,59 @@ const Analytics = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Admin</td>
-                  <td>React Basics</td>
-                  <td>16/02/2026</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>User</td>
-                  <td>Understanding Hooks</td>
-                  <td>15/02/2026</td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>Test</td>
-                  <td>JavaScript Guide</td>
-                  <td>14/02/2026</td>
-                </tr>
+                {loading ? (
+                  <div className="loading-state">Loading posts...</div>
+                ) : currentPosts.length > 0 ? (
+                  currentPosts.map((post, index) => (
+                    <tr key={index}>
+                      <td>{post.id}</td>
+                      <td>{post.author || "Anonymous"}</td>
+                      <td>{post.title}</td>
+                      <td>{new Date(post.createdAt || Date.now()).toLocaleDateString()}</td>
+                      <td className="action-buttons">
+                        <button className="edit-btn" onClick={() => handleEdit(post.id)}>
+                          ✏️
+                        </button>
+                        <button className="delete-btn" onClick={() => handleDelete(post.id)}>
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <div className="no-posts">
+                    <p>No posts yet. Be the first to create a post!</p>
+                  </div>
+                )}
               </tbody>
             </table>
           </div>
 
           {/* Pagination */}
           <div className="pagination">
-            <button className="page-btn">Previous</button>
-            <button className="page-btn active">1</button>
-            <button className="page-btn">2</button>
-            <button className="page-btn">3</button>
-            <button className="page-btn">Next</button>
+            <button
+              className="page-btn"
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            {[...Array(Math.ceil(posts.length / postsPerPage))].map((_, index) => (
+              <button
+                key={index}
+                className={`page-btn ${currentPage === index + 1 ? "active" : ""}`}
+                onClick={() => paginate(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              className="page-btn"
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === Math.ceil(posts.length / postsPerPage)}
+            >
+              Next
+            </button>
           </div>
         </div>
       </main>
