@@ -35,14 +35,14 @@ color: #818cf8;
 [data-theme='dark'] .dashboard-welcome h1,
 [data-theme='dark'] .secrtion-title,
 [data-theme='dark'] .post-card-title{
- color: #94a3b8;
+ color: #94a3b9;
 }
 
 [data-theme='dark'] .dashboard-welcome p,
 [data-theme='dark'] .post-meta,
 [data-theme='dark'] .post-card-description,
 [data-theme='dark'] .dash-card h3{
-color: #1e293b;
+color: #e8f0fc;
 }
 
 [data-theme='dark'] .dash-card,
@@ -121,8 +121,14 @@ color: #1e293b;
  color: #94a3b8;
 }
 
+[data-theme='dark'] .form-group label{
+color: #c5d3e8;
+}
+
 [data-theme='dark'] .chart-card,
-[data-theme='dark'] .post-table-section{
+[data-theme='dark'] .post-table-section,
+[data-theme='dark'] .create-post-container
+{
  background: #1e203b;
  border-color: #334155;
 }
@@ -137,7 +143,7 @@ color: #1e293b;
  color: #cbd5e1;
 }
 
-[data-theme='dark'] .an td{
+[data-theme='dark'] .analytics-table td{
  color: #f1f8fc;
  border-color: #334155;
 }

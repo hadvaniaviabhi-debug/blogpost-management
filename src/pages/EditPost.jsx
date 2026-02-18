@@ -7,14 +7,16 @@ import {
   FaTimes,
   FaUser,
 } from "react-icons/fa";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "../component/Navbar";
 import "./CreatePost.css";
 
 const EditPost = () => {
-  const { id } = useParams(); // get post id from URL
+  const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();   // ✅ added
+  const from = location.state?.from; // ✅ get source page
   const fileInput = useRef(null);
 
   const [formData, setFormData] = useState({
@@ -46,14 +48,19 @@ const EditPost = () => {
         setImagePreview(data.image);
       } catch (error) {
         toast.error("Failed to load post");
-        navigate("/dashboard");
+
+        // ✅ fallback navigation
+        if (from === "analytics") {
+          navigate("/analytics");
+        } else {
+          navigate("/dashboard");
+        }
       }
     };
 
     fetchPost();
-  }, [id, navigate]);
+  }, [id, navigate, from]);
 
-  // 🔹 Handle input change
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -61,14 +68,12 @@ const EditPost = () => {
     });
   };
 
-  // 🔹 Handle Image URL
   const handleImageUrlChange = (e) => {
     const url = e.target.value;
     setFormData({ ...formData, imageUrl: url });
     setImagePreview(url || null);
   };
 
-  // 🔹 Handle File Upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -81,7 +86,6 @@ const EditPost = () => {
     reader.readAsDataURL(file);
   };
 
-  // 🔹 Remove Image
   const removeImage = () => {
     setImagePreview(null);
     setFormData({ ...formData, imageUrl: "" });
@@ -118,7 +122,14 @@ const EditPost = () => {
       if (!response.ok) throw new Error();
 
       toast.success("Post updated successfully!");
-      navigate("/dashboard");
+
+      // ✅ Conditional Redirect
+      if (from === "analytics") {
+        navigate("/analytics");
+      } else {
+        navigate("/dashboard");
+      }
+
     } catch (error) {
       toast.error("Failed to update post");
     } finally {
@@ -144,7 +155,6 @@ const EditPost = () => {
         <div className="post-form-card">
           <form onSubmit={handleSubmit}>
             
-            {/* Title */}
             <div className="form-group">
               <label>Post Title</label>
               <div className="input-wrapper">
@@ -160,7 +170,6 @@ const EditPost = () => {
               </div>
             </div>
 
-            {/* Author */}
             <div className="form-group">
               <label>Author Name</label>
               <div className="input-wrapper">
@@ -175,7 +184,6 @@ const EditPost = () => {
               </div>
             </div>
 
-            {/* Description */}
             <div className="form-group">
               <label>Description</label>
               <textarea
@@ -187,78 +195,6 @@ const EditPost = () => {
               />
             </div>
 
-            {/* Image Section */}
-            <div className="form-group">
-              <label>Cover Image</label>
-
-              {!imagePreview && (
-                <div className="image-source-tabs">
-                  <button
-                    type="button"
-                    className={`tab-btn ${imageTab === "url" ? "active" : ""}`}
-                    onClick={() => setImageTab("url")}
-                  >
-                    Image URL
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`tab-btn ${imageTab === "file" ? "active" : ""}`}
-                    onClick={() => setImageTab("file")}
-                  >
-                    Upload File
-                  </button>
-                </div>
-              )}
-
-              {imageTab === "url" && !imagePreview && (
-                <div className="input-wrapper">
-                  <FaLink className="input-icon" />
-                  <input
-                    type="url"
-                    value={formData.imageUrl}
-                    onChange={handleImageUrlChange}
-                    className="form-control"
-                  />
-                </div>
-              )}
-
-              {imageTab === "file" && !imagePreview && (
-                <div
-                  className="image-upload-area"
-                  onClick={() => fileInput.current.click()}
-                >
-                  <FaCloudUploadAlt className="upload-icon" />
-                  <p>Click to upload image</p>
-                  <input
-                    ref={fileInput}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    style={{ display: "none" }}
-                  />
-                </div>
-              )}
-
-              {imagePreview && (
-                <div className="image-preview-container">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="image-preview"
-                  />
-                  <button
-                    type="button"
-                    className="remove-image-btn"
-                    onClick={removeImage}
-                  >
-                    <FaTimes />
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Buttons */}
             <div className="form-actions-row">
               <button
                 type="submit"
@@ -272,7 +208,13 @@ const EditPost = () => {
               <button
                 type="button"
                 className="cancel-btn"
-                onClick={() => navigate("/dashboard")}
+                onClick={() => {
+                  if (from === "analytics") {
+                    navigate("/analytics");
+                  } else {
+                    navigate("/dashboard");
+                  }
+                }}
               >
                 Cancel
               </button>

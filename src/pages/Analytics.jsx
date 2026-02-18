@@ -33,7 +33,7 @@ const Analytics = () => {
 
   const COLORS = ["#0088fe", "#00d49f", "#ffbb28", "#ff8042"];
 
-  // ✅ Fetch Posts
+  // Fetch Posts
   const fetchPosts = async () => {
     try {
       setLoading(true);
@@ -53,7 +53,7 @@ const Analytics = () => {
     }
   };
 
-  // ✅ Delete Post
+  // Delete Post
   const handleDeletePost = async (id) => {
     try {
       const confirmDelete = window.confirm("Are you sure you want to delete this post?");
@@ -75,7 +75,7 @@ const Analytics = () => {
     }
   };
 
-  // ✅ Calculate Posts Per Author
+  // Calculate Posts Per Author
   const authorStats = posts.reduce((acc, post) => {
     const author = post.author || "Unknown";
     acc[author] = (acc[author] || 0) + 1;
@@ -101,9 +101,8 @@ const Analytics = () => {
           <p>Insights into your blog performance and activities</p>
         </header>
 
-        {/* Charts Section */}
+        {/* Charts */}
         <div className="charts-container">
-          {/* Bar Chart */}
           <div className="chart-card">
             <h3>Posts per Author</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -113,12 +112,11 @@ const Analytics = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="posts" fill="#8884d8" name="Number of Posts" />
+                <Bar dataKey="posts" fill="#8884d8" />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Pie Chart */}
           <div className="chart-card">
             <h3>Distribution</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -134,10 +132,7 @@ const Analytics = () => {
                   }
                 >
                   {chartDataUpdated.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
+                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -147,7 +142,7 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Table Section */}
+        {/* Table */}
         <div className="posts-table-section">
           <h3>All Posts</h3>
 
@@ -166,46 +161,37 @@ const Analytics = () => {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="5" className="loading-state">
-                      Loading posts...
+                    <td colSpan="5">Loading posts...</td>
+                  </tr>
+                ) : currentPosts.map((post) => (
+                  <tr key={post.id}>
+                    <td>{post.id}</td>
+                    <td>{post.author || "Anonymous"}</td>
+                    <td>{post.title}</td>
+                    <td>
+                      {new Date(post.createdAt || Date.now()).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <button
+                        className="edit-btn"
+                        onClick={() =>
+                          navigate(`/edit-post/${post.id}`, {
+                            state: { from: "analytics" }   // ✅ IMPORTANT
+                          })
+                        }
+                      >
+                        ✏️
+                      </button>
+
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeletePost(post.id)}
+                      >
+                        🗑️
+                      </button>
                     </td>
                   </tr>
-                ) : currentPosts.length > 0 ? (
-                  currentPosts.map((post) => (
-                    <tr key={post.id}>
-                      <td>{post.id}</td>
-                      <td>{post.author || "Anonymous"}</td>
-                      <td>{post.title}</td>
-                      <td>
-                        {new Date(
-                          post.createdAt || Date.now()
-                        ).toLocaleDateString()}
-                      </td>
-                      <td className="action-buttons">
-                        <button
-                          className="edit-btn"
-                          onClick={() =>
-                            navigate(`/edit-post/${post.id}`)
-                          }
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleDeletePost(post.id)}
-                        >
-                          🗑️
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="no-posts">
-                      No posts yet. Be the first to create a post!
-                    </td>
-                  </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
