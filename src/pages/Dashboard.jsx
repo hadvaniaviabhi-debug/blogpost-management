@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaStar } from "react-icons/fa";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "../component/Navbar";
 import "./Dashboard.css";
+import Favorites from "./Favorites";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Dashboard = () => {
   const handleClick = (postId) => {
   navigate(`/post-details/${postId}`);
 };
+
 
   // Fetch all posts from db.json
   const fetchPosts = async () => {
@@ -116,6 +118,9 @@ const Dashboard = () => {
                       alt={post.title}
                       className="post-card-image"
                     />
+                    <button className={`favorites-btn ${Favorites.includes(post.id)?'active':''}`}>
+                      <FaStar size={22} color="#ffffff"/>
+                    </button>
 
                     <div className="post-actions">
                       <button

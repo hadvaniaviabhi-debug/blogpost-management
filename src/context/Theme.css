@@ -272,3 +272,7 @@ color: #c5d3e8;
   background: #e53e3e;
   color: white;
 }
+
+[data-theme='dark'] .dash-number{
+  color:  #8c1aff;
+}
