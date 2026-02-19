@@ -38,6 +38,7 @@ body {
 .form-group {
     margin-bottom: 25px;
     text-align: left;
+    color: red;
 }
 
 .form-group label {

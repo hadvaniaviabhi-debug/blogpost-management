@@ -284,6 +284,7 @@
 
 .loading-spinner {
   text-align: center;
+
   padding: 4rem;
   color: #6366f1;
   font-weight: 600;
@@ -298,4 +299,53 @@
   .dashboard-welcome h1 {
     font-size: 1.75rem;
   }
+}
+
+
+.favorites-btn{
+  position: absolute;
+
+  top: 15px;
+  left: 15px;
+  background: rgba(75, 85, 99, 0.9);
+  border: none;
+  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 30;
+  opacity: 0;
+  transform: translateX(-15px);
+}
+
+
+.favorites-btn.active{
+  background: #d97706 !important;
+}
+
+.favorites-card:hover .favorites-btn{
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.favorites-btn:hover{
+  transform: scale(1.1);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+.favorites-btn.active:hover{
+  background: #b45309;
+}
+
+.favorites-btn svg{
+  width: 20px !important;
+  height: 20px !important;
+  color: white !important;
+  fill: white !important;
+  flex-shrink: 0 !important;
+  display: block !important;
 }

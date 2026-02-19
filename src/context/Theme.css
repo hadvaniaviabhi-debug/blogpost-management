@@ -218,3 +218,57 @@ color: #c5d3e8;
  color: #f8fafc;
  border-color: #475569;
 }
+
+[data-theme='dark'] .favorites-page-container{
+  background-color: #0f172a;
+}
+
+[data-theme='dark'] .favorites-header{
+  border-color: #334155;
+}
+
+[data-theme='dark'] .favorites-header h2,
+[data-theme='dark'] .fav-title,
+[data-theme='dark'] .fav-empty-state h3{
+  color: #f8fafc;
+}
+
+
+[data-theme='dark'] .fav-meta,
+[data-theme='dark'] .fav-excerpt,
+[data-theme='dark'] .fav-empty-state p{
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .count-badge{
+  background: #334155;
+  color: #cbd5e1;
+}
+
+[data-theme='dark'] .fav-card,
+[data-theme='dark'] .fav-empty-state{
+  background: #1e293b;
+  border-color: #334155;
+
+}
+
+[data-theme='dark'] .favorites-hero{
+  background: linear-gradient(135deg , #1e293b 0%,#0f172a 100% );
+  box-shadow:  0 10px 30px rgba(0,0,0,0.3);
+}
+
+[data-theme='dark'] .read-btn{
+  background: #334155;
+  color: #f8fafc;
+}
+
+[data-theme='dark'] .remove-fav-btn{
+  background: rgba(229,62,62,0.1);
+  color: #f87171;
+}
+
+
+[data-theme='dark'] .remove-fav-btn:hover{
+  background: #e53e3e;
+  color: white;
+}
