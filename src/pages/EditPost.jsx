@@ -15,8 +15,8 @@ import "./CreatePost.css";
 const EditPost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();   // ✅ added
-  const from = location.state?.from; // ✅ get source page
+  const location = useLocation();
+  const from = location.state?.from;
   const fileInput = useRef(null);
 
   const [formData, setFormData] = useState({
@@ -39,17 +39,16 @@ const EditPost = () => {
         const data = await res.json();
 
         setFormData({
-          title: data.title,
-          author: data.author,
-          description: data.description,
-          imageUrl: data.image,
+          title: data.title || "",
+          author: data.author || "",
+          description: data.description || "",
+          imageUrl: data.image || "",
         });
 
-        setImagePreview(data.image);
+        setImagePreview(data.image || null);
       } catch (error) {
         toast.error("Failed to load post");
 
-        // ✅ fallback navigation
         if (from === "analytics") {
           navigate("/analytics");
         } else {
@@ -101,10 +100,11 @@ const EditPost = () => {
 
     try {
       const updatedPost = {
-        ...formData,
+        title: formData.title,
+        author: formData.author,
+        description: formData.description,
         image:
-          formData.imageUrl ||
-          "https://via.placeholder.com/600x400",
+          formData.imageUrl || "https://via.placeholder.com/600x400",
         updatedAt: new Date().toISOString(),
       };
 
@@ -123,13 +123,11 @@ const EditPost = () => {
 
       toast.success("Post updated successfully!");
 
-      // ✅ Conditional Redirect
       if (from === "analytics") {
         navigate("/analytics");
       } else {
         navigate("/dashboard");
       }
-
     } catch (error) {
       toast.error("Failed to update post");
     } finally {
@@ -155,6 +153,7 @@ const EditPost = () => {
         <div className="post-form-card">
           <form onSubmit={handleSubmit}>
             
+            {/* Title */}
             <div className="form-group">
               <label>Post Title</label>
               <div className="input-wrapper">
@@ -170,6 +169,7 @@ const EditPost = () => {
               </div>
             </div>
 
+            {/* Author */}
             <div className="form-group">
               <label>Author Name</label>
               <div className="input-wrapper">
@@ -184,6 +184,7 @@ const EditPost = () => {
               </div>
             </div>
 
+            {/* Description */}
             <div className="form-group">
               <label>Description</label>
               <textarea
@@ -195,6 +196,65 @@ const EditPost = () => {
               />
             </div>
 
+            {/* Image Tabs */}
+            <div className="form-group">
+              <label>Image</label>
+
+              <div className="image-tabs">
+                <button
+                  type="button"
+                  className={imageTab === "url" ? "active" : ""}
+                  onClick={() => setImageTab("url")}
+                >
+                  <FaLink /> URL
+                </button>
+
+                <button
+                  type="button"
+                  className={imageTab === "upload" ? "active" : ""}
+                  onClick={() => setImageTab("upload")}
+                >
+                  <FaCloudUploadAlt /> Upload
+                </button>
+              </div>
+
+              {imageTab === "url" && (
+                <input
+                  type="text"
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleImageUrlChange}
+                  className="form-control"
+                  placeholder="Enter image URL"
+                />
+              )}
+
+              {imageTab === "upload" && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInput}
+                  onChange={handleImageUpload}
+                  className="form-control"
+                />
+              )}
+
+              {/* Preview */}
+              {imagePreview && (
+                <div className="image-preview">
+                  <img src={imagePreview} alt="Preview" />
+                  <button
+                    type="button"
+                    className="remove-image"
+                    onClick={removeImage}
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Buttons */}
             <div className="form-actions-row">
               <button
                 type="submit"
@@ -208,13 +268,11 @@ const EditPost = () => {
               <button
                 type="button"
                 className="cancel-btn"
-                onClick={() => {
-                  if (from === "analytics") {
-                    navigate("/analytics");
-                  } else {
-                    navigate("/dashboard");
-                  }
-                }}
+                onClick={() =>
+                  from === "analytics"
+                    ? navigate("/analytics")
+                    : navigate("/dashboard")
+                }
               >
                 Cancel
               </button>
