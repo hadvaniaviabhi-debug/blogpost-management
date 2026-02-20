@@ -1,76 +1,163 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../component/Navbar";
 import "./Favorites.css";
 import { MdDeleteSweep, MdOpenInNew } from "react-icons/md";
 import { FaRegStar } from "react-icons/fa";
+
 const Favorites = () => {
   const navigate = useNavigate();
+  const [favoritePosts, setFavoritePosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch favorite posts
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const favoriteIds =
+          JSON.parse(localStorage.getItem("favorites")) || [];
+
+        const response = await fetch("http://localhost:3000/posts");
+        const allPosts = await response.json();
+
+        const filtered = allPosts.filter((post) =>
+          favoriteIds.includes(post.id)
+        );
+
+        setFavoritePosts(filtered);
+      } catch (error) {
+        console.error("Error fetching favorites:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
+
+  // Remove single favorite
+  const removeFavorite = (id) => {
+    const updatedIds =
+      JSON.parse(localStorage.getItem("favorites"))?.filter(
+        (favId) => favId !== id
+      ) || [];
+
+    localStorage.setItem("favorites", JSON.stringify(updatedIds));
+
+    setFavoritePosts(favoritePosts.filter((post) => post.id !== id));
+  };
+
+  // Clear all favorites
+  const clearAll = () => {
+    localStorage.removeItem("favorites");
+    setFavoritePosts([]);
+  };
 
   return (
     <div className="favorites-page-container">
       <Navbar />
+
       <main className="favorites-main">
         <div className="favorites-hero">
           <div className="hero-shape"></div>
           <div className="hero-content">
-            <h1>your reading list</h1>
-            <p>enjoy the collection of stories you've curated</p>
+            <h1>Your Reading List</h1>
+            <p>Enjoy the collection of stories you've curated</p>
           </div>
         </div>
+
         <div className="favorites-content">
           <div className="favorites-header">
             <h2>
               Curated Collection
-              <span className="count-badge">3</span>
+              <span className="count-badge">
+                {favoritePosts.length}
+              </span>
             </h2>
-            <button className="clear-all-btn">
-              <MdDeleteSweep size={20} /> clear list
-            </button>
+
+            {favoritePosts.length > 0 && (
+              <button className="clear-all-btn" onClick={clearAll}>
+                <MdDeleteSweep size={20} /> Clear List
+              </button>
+            )}
           </div>
-          <div className="fav-empty-state">
-           <div className="empty-icon-wrapper">
-            <FaRegStar className="empty-icon"/>
-           </div>
-           <h3>your list is emapty</h3>
-           <p>Discover interesting posts and save them to read later</p>
-           <button className="browser-btn">
-            Exploer Stories
-           </button>
-          </div>
-          <div className="favorites-grid">
-            <div className="fav-card">
-              <div className="fav-card-image">
-                <img src="data:image/jpeg;base64,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" alt="Post" />
-                <div className="fav-card-overlay">
-                  <button className="read-btn">
-                    <MdOpenInNew /> Read Article
-                  </button>
-                </div>
-              </div>
-              <div className="fav-card-body">
-                <div className="fav-meta">
-                  <span className="fav-author">Author name</span>
-                  <span className="fav-date">resent</span>
-                </div>
-                <h3 className="fav-title">simple post title</h3>
-                <p className="fav-excerpt">
-                  this is a smaple sdescription of the post used only favorites.
-                </p>
-                <button className="remove-fav-btn">
-                 Remove
-                </button>
-              </div>
+
+          {loading ? (
+            <div className="fav-empty-state">
+              <p>Loading favorites...</p>
             </div>
-            <div className="fav-card">
-             <div className="fav-card-image">
-              <img 
-              src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlAMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAADBAACBQYBB//EAEEQAAICAQMCBAIIAwYCCwAAAAECAxEABBIhMUEFEyJRYXEGMoGRobHB8BQjQhUzUmLR4bLxFiQ1Q0RTcoKDotL/xAAaAQEBAQEAAwAAAAAAAAAAAAAAAQIDBAUG/8QAJREBAQACAQQBAwUAAAAAAAAAAAECEQMEEiExQSJxoRMyQlFh/9oADAMBAAIRAxEAPwDidOqtqWJYsAVG4nkUM39H4VHPpdRrXIXY+1YyLs/YPjeZWm0irp0kY7WamZR731zcknOg00umWMGRno8hgRtHb8jkk8MsDXwr/EuEJYj6pYffmepsMbo8/ZmhqfNV1teqk8fPM4C99e7frjStdFEiRrXlgVVHgcVeOeHzr4fqofPi82NSQ0aEg1icGqWKNZOWkVQEvkfHjDSeJ6jVT+qQIh42irPU9unU9MsukajeK1plXSwpHtgeA0pWyG/qHc7azltaP+tuN2+j9YNus9zffNubUHzGhC7i0jsNvUeZHVk3dAjMYBXmBG7Y31bH775rZCzxhVMhoV1A7j4+2FMU0aCUkJHJ6AeRu+zrWaSwTvPArPt5IjkJ9IPXqPzwk0MMUen05mWfeGNhiViuq68djwOwHyyaVjSIfI8x1AW9oaiex4/DAME4NHp0LXjuvkdo5DvXy0lLCJWJVbPFA9u2ZxcmgUUHveYsFjuPRbA7E4fUKEgARlcyqrA3RjI9x8sW8wbrPT2rIzh1tUO52IjA6c8Dj8csAnZXkIjQV87z1VkldUULzwATxjGpgGmiCuCpWgVI5JoE8/bilEtuWq7HAmoLKSGWmHbtkZ7mEitbVZA/HKagtdSGj8cYh0nnputIwEJotyT+/bKFPPK2I+nyvPcoqysAVicj3TpkwrrUmQxSbuXIpSx9XzGPQ1vkYHigaPxBzK2efIKJBqxR3LXwOaKSx/yzEGUeUu5XPVh1+zJj/rKmo51K7qoRGvvGYoNat12/1HjNqHVXrVEuzaVcWE965/DMaQqNZKU6bzWWqb0Yl8qil7GIN8fvjFJykLsIaH22cchk2aiSESkeao6Hv0OVh0u6Ta3JP1j3yaHnhC6ibxOEKJC0i1antjWt0fpjrhn3Fev+I1+nTG32eHLo9VB5f8t2jajW674OA0kwd9LMaKxuKXddHcT9n+2a8BmKebRafyPMhlQoxXyudhIB5+OYuolclWJoKCLFHNrxOfSRTh9sbk3aAWrenvXXm+/fOflJaAbWPpJ4Cc3Q/DJSFXeRopGJ4Joge/bFD1JJJx2oo9XtTc0a+quln51iTkF2AFC+B7DCoDyBjEUbzSt5ZoxR+aPji4G2nPQHCHarSCwCdq11vANLqJNdJ5pEr9FCgX2rk5DBMAJOI6faf8QPbHYWuMKg2+ulUdK+eeeIrNG0YZJFiofWINnrxgZ2uUCNma/NLWWJvdg9PIFZHRh5qX175bWXsAblwbAPtlYGaCVZkA3KAwK84Gguj1mhHkqr9mPF1YHtkyk2okWZ/wCG1xhiu1RASAMmVny6OFY2VfQE7WO2JCzIEB6LX3YQsyRgk/LFYT5k5B4uz9+XQK0bF4tvUsQPuOZZZjOzVwz2M328pNGzsD5wlTZXtdH885y9s21gSVarv45Kp+RZIninJI2n1e9HjNPTPUkkkaBjsoq3Nduf37ZnS+bJHIl2GG3kdMLodYxO5trbgquXFkEdfyyKHrpSZZvLkPlhwQNpAejz92LxuiKRucMXux0247JGiQybyS01i35vjsMyI9rRpQpu/wAcIfmmaZVYn0gcCuvvhDPHFI8kkYkLBgt8cnoaxJUIJJICWOvbLzqN7k/VJpReFBlUyNGdzMwveAOVHyxGWvNbapUXwDmvo5Y9Jq3DPcbDa8iDcQPhf55na1kfWytEWKlrBbr9uANELsqD+rirrPI3CsA9MEN/+o4eBd1BXCuD9Y9BgY4XaAyopAV63dv3zkDq6hdpQaZAy1ta/YdSOnOeaxZDpfOYKNxPQdP1y8yJHJFJErLGQvVbB4F1WH1U8Y0UkccT+Z5m7zGqgLNAYRk6l42gPB3HjF41tQas/bj3ibDYvpF0LPvicYLRNfBNdcKsug1U43xou3oCX239mTIzPF6Rfv1vJlHStqGk5KjixQzyGjqlsUCh/LAQttjW+tZ6j1LGScu0G1DfyJOTY5+6syJFrVOP81/jmpqmHlzV0IzNlBOspQSWIArFWGy57buvArK6bcNWUU7SSG5NZ5PqI9Hql02tZ4mYAk1u2g9+MzZ5H8S8Rh0UKsokdY+eCwvqczua2vbdyadRrdDLLsXU6zTQvtBUO9vRs3Sg++KxeERBCo18Zb/LDL/+c3fB/Cdd4vPqZtBp1ZVdgsshoKEAUKPfpdfHMrWT6pXaPVPKJFNbRwB9gzOOOVm7WsssZdSEZtJBCGjl8T0ymujiQH/hyk+kmba0csEqCyNkg/WsrqI4nZD6i1+oEWM9jXlRDH6e69vx6Zqyz5Y3P6KbZFLqQQT1sYpNQfcFoE8VmxqDPCxCv9U+kkA18LxV4odUTtZYpb5VjSN8j2ybX2HpdM7QTS9kYKTfuLyz7G0LFbMhoLzwB3Pz4wmmcwQ6iAuqOAC0TcN7WL69e2N6nR+V4PpH3q5lWwFqxZPGSoC07z6KJZBGqICAdosHvz17YPVhl07AtYWQDr1wEe9YgSjAeoFiOpHbCagyPpQ4ZTF5ouq60Oflmgv4irjSjcvooUwxWP6gNDpmp4oom0rySsgfyxtCkAtz1rrmVDu8sVgGUBxZGe4dN20XQ+BGTAaBkJFLwMsQ3pO3ocqskn9PPxu8IHlyyy+YishdlYbTzX3YlqtWdLM4VfWy2p7gDrmjUjdcw/GfRr4d/wBUobyZTcawy1fBjw/x1nqORFEgbdGWWwD2H250fhHiemfVTSQ6SOOVZOLG4c9avpyTnG6XTiMFqDE9z2+WaH0elEc1Hi+c8bLhxylkeVhz5Y2bfWPBvo3DqIo9ZotE+nkBpJIpCu5vYc5XVeA6JpnXWRyLJfqMjNZPx7jHPot9Io9BoDDJ5csbKSFkA2g9/wAhmf4j4zrdROBpngKKfSkmpBAHsLFgfbk5ODWP052X7tcfPvP6sJZ9gn+ivh+wusMjIP6o5Swwa/R/w0L6PNs9fXzmv4ZqHnmP8Zomh49M+nmUj7QD+QzYOn0UibZWLv8A+YCA2erznU78Z/l7HCdPZvs/Dkv7A0Jq/Nav8Tg/mMrJ9H9E3Jd7+GwH/hzqf7O0m0kTyE/02OmKPodQG9CBh7qc45Z9ZJ+50/T6W/xjm0+i/hq/WWR76GSSyL9uMt/0b8OKFRG61wCJDxXzzf8A4TVD/uD87GK6tJhpGRY3eRyAwQgekn1VfwvOWHP1HfJllZt0z4eHsusZdOE8Q8Jk8OWWOVWMbnzImIoOpuiB++mY2oJWIwgsF33WfSvpR4tptV5J1XhcapGm0/zQWJPdtvTpnF+IDw2Q+ZFE6Enpv4GfT4ZY3Gau3zecsy8zTE8TdShWwqqoC7SSMRjl2xlARY/HNXXQwvGQm+64AOJPpD5QZQxrrxl2yGs7yC6rt1yYT+Eci2DAnmlyY3E2LpnWOUkAstiwW5J5+/8A2xyDUyKPWNwHVgQMX2IDyp4Fkbb/ACy4j2EUjc9aHTMTx6dDn8RA3R+ficw/HpEGqhbgrtKnHJYkbn1bj2AxHV6MMDva/wA83MmdFtLqikZRha9A2G8Om8vURn41iUmmeH6t5VJCjAnisds+FuVdtpdaZIm02/aX/u+aAbt9/TM2bxCXeyyAhgaZWHIOZWn1zL1cLz1bpl9RM+pmMsk0ZY1zuHOYxxsvlrLKWbns8niQB/qHyY41F45PH/d67Ux/DzXH65hMp4vaR8Dg3oOw86MgdCT0xlw4X4ax588fl18X0l8UA9HikxHxkv8APGovpN4vfHiUn/1/0ziUhRvraqFfmw/1ww0kBH/aMAPzX/XOOXSY31XWdXlPcdbP9JvEuRN4tIP/AJAPyzJ1n0jdlK/xepnY9t7bcxJNPAv/AI6In4MP0JwUKadJRvnVjtNUp6+/TGPR4b+ryuXW8lmsfDofB55dXpNYZAKMkYoHjjccOYTsAo13rnM3Rw+XSwyny2bcRYFmiP1xzy5VHDrfyztOPXp42eXd7XbT0wYAtfUA5JI9o9HpU9VI/wB8HWsAuM2vxfJ5+qH14A32Xi4ufio7i+Ebp2GTPP40jrAQflnuZ7TthVCg27X2E8deMYVhGwRQjEWS3XviC8HqeO19MunpHXoObbNtHm2oSHVbHQqx4v7cFLEGKsDwB784FXYkkMDdCvfDIi2QZAL+f3YBP4WF0Be7I784nNoNASQzSb/dVx6NgpKhlbjg4QpG4tlDAnqO2blRhSeH6b1eVNL8LAxY6JgaBPA9s6zw/wAP3jhF22au+RlfEvD303r2egi9y9KzWjbkP4Zh9cgfPINMeLa815I2jFtp773d4Ajf0QKT7DM7CsWiRj65GUe4o40vhEDcjWX8awsEG4fXB578Y6+i1SxeYdKXU9CRYr7MndGpjaWTwKAEl5pHAF8cX8sZi8D8PN+ZHOB8WOUUmNjZeM10rg5o6HUyGlYKb7p1PzvJMtlxsW03gukiH8hiB7Phm8PUWVK/+281JYv4eJZJIiAeLKnM4+JKf5cN3zZ6HNMqjTbB3b4XeDIrgJ27Zb+0WaO5VBb2I3fgM9OuQJv8se1DKgRIv+6J+7JlvOV/UIV596H55MK56xfIBHH2579QWTYPSs8SKVGjZ1WnPCuwAHz9s8XapLAk03cXec1HRyqq201Q5IvtkjYUrJ1vqb9vasAXFgEkKOvH4Y0oZgWQ3xz7L8sC0dHi2W+vOPhFZQQV6eqhyMQRGO0qCoar9QAION6VUSQ+be5utErXx+7EppseB6qtWkdkEGxd9vl++M6bXtAUYedFvoA3dWetfh1rOHMgg1KzJJuCkOR8P2DnWDV6XW6dGke5kBW0oKoPcgZ3wy3GbHLaqKeAUVABblfn7H9cSkhVWtAjAH1A9v3WdT4npfLW/MiZHYgNG1lwe9Hp1zHk0QZTbEsBQUHn7855RZWSygsSABR7Z4z0AQovsVNY1/Zmq2X5YUDk81gjomLjexIPtmO10mWi00zTUsp3UaFkkisc8FjvVD+WDR+sWqvjeXj8NSbdtdxt4AIq8Z0WnGka6DG+QwsVkmJctul8U1OqfQJE84OnVfSA1+44NcjpnFeIRqZmuRIj15Bv8c6OXUCWAKyKrAH6i0OvbMTV6eOUncpr2LVnVyZTyFiqyPYU12H6YfTxgXt1bANweeMINNCgvbfza8G5TkKkagngBSLwHEpVHBNi+UvPMVErgemLj4XkwpQKofk8AH1gXY+7LhViKmzRJPt05AN4vuI53OHUcFK69sKQ25WZmajRC8k2L+3pnNp6JU9Ds4O2MbgF9+f3889CnbsLBTVqNw6fM4KN4U0/Eblq/lndwvPQ8c4QM5H8tPrCto5r5V074QzFKqxNESrUQFZaW/nffPZW/kJMJGLUKAdTx3JA+XfFqlZNzfzGvrY+/LpJGabyyF/zf1Gv0wbO6aYSgKtKm2qFXRJvvmhpA0JJheQ7jxdVWZEbEEsqkAgKrGrGb+jjGqCRhk3c7tzAV8fwzURuro4CzeVJ5qKBQROD7/piUulWOUcFGbkge3z/AEzyHzVUssdrYXepA2/8+cI7N5jj6zD0jsK7Ue/XN7QCQtTBW3C/UP32xdwgYjy+AOLW7GG857OzcvHI6dfs+GBchASeT8Oh+OQeliV2qBS+w+rlHbcORVfHPDuDuoBIUGyR8e3bPA6hbdmWhyPbAvW7aCSCRf2YGaEbbdGk+RFj7MjyoADRU9ie/OVExDcEHigaIwMxoY2umdfcsKrPRAyHaiSFjwS/IJzTULJGVoA9aYe2AdnHKS0T/hGAidPMnBWu9Vkxkyak8r5RvrZr9cmBzTykqVIBG4cH45dyFl8vapUueoyZM5R0GmmaJI4kC7GboRdc4J5XVWfdZPuBxkyZUojdCRxTDjtjc2njRpaX+kNZ98mTCGtFIE8PmZY03hQ26ubvH9NIfMDkKaDMARwDRP55Mmbgb/tCd5l3bT5hYMK4OG0yrrNGHkXbak7UJrt7/PPcmVBJEA8Ojk53lgl3+PzwUcQkkmVmb0A8jv8APJkyIViJkZZHJJa7HbJqI1+tQtStce/XPcmUA2A7uueSMQEF2OODnuTA8boe5DgWcojsFoHi6+zJkwLOAW57cZMmTA//2Q=="
-              alt="Post"
-              />
-             </div>
+          ) : favoritePosts.length === 0 ? (
+            <div className="fav-empty-state">
+              <div className="empty-icon-wrapper">
+                <FaRegStar className="empty-icon" />
+              </div>
+              <h3>Your list is empty</h3>
+              <p>
+                Discover interesting posts and save them to read later
+              </p>
+              <button
+                className="browser-btn"
+                onClick={() => navigate("/dashboard")}
+              >
+                Explore Stories
+              </button>
             </div>
-          </div>
+          ) : (
+            <div className="favorites-grid">
+              {favoritePosts.map((post) => (
+                <div className="fav-card" key={post.id}>
+                  <div className="fav-card-image">
+                    <img
+                      src={
+                        post.image ||
+                        "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=500"
+                      }
+                      alt={post.title}
+                    />
+
+                    <div className="fav-card-overlay">
+                      <button
+                        className="read-btn"
+                        onClick={() =>
+                          navigate(`/post-details/${post.id}`)
+                        }
+                      >
+                        <MdOpenInNew /> Read Article
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="fav-card-body">
+                    <div className="fav-meta">
+                      <span className="fav-author">
+                        {post.author || "Anonymous"}
+                      </span>
+                      <span className="fav-date">
+                        {new Date(
+                          post.createdAt || Date.now()
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <h3 className="fav-title">{post.title}</h3>
+
+                    <p className="fav-excerpt">
+                      {post.description ||
+                        post.content ||
+                        post.excerpt}
+                    </p>
+
+                    <button
+                      className="remove-fav-btn"
+                      onClick={() => removeFavorite(post.id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>
