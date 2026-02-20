@@ -18,7 +18,7 @@ const Dashboard = () => {
     navigate(`/post-details/${postId}`);
   };
 
-  // Fetch all posts from db.json
+  // Fetch all posts
   const fetchPosts = async () => {
     try {
       setLoading(true);
@@ -40,6 +40,7 @@ const Dashboard = () => {
   // Toggle Favorite
   const toggleFavorite = (postId) => {
     let updatedFavorites;
+
     if (favorites.includes(postId)) {
       updatedFavorites = favorites.filter((id) => id !== postId);
       toast.info("Removed from favorites");
@@ -58,12 +59,13 @@ const Dashboard = () => {
     navigate("/login");
   };
 
-  // Delete post
+  // Delete Post
   const handleDeletePost = async (id) => {
     try {
       await fetch(`http://localhost:3000/posts/${id}`, {
         method: "DELETE",
       });
+
       setPosts(posts.filter((post) => post.id !== id));
       toast.success("Post deleted successfully");
     } catch (error) {
@@ -72,16 +74,25 @@ const Dashboard = () => {
     }
   };
 
-  // Get current user from localStorage
+  // Get current user
   const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
   const currentUser = loginData?.email?.split("@")[0] || "User";
 
-  // Calculate stats
+  // =========================
+  // Calculate Dashboard Stats
+  // =========================
+
   const totalPosts = posts.length;
+
   const userPosts = posts.filter(
     (post) => post.author?.toLowerCase() === currentUser.toLowerCase()
   ).length;
+
   const communityPosts = totalPosts - userPosts;
+
+  const favoritePosts = posts.filter((post) =>
+    favorites.includes(post.id)
+  );
 
   return (
     <div className="dashboard-page">
@@ -106,7 +117,7 @@ const Dashboard = () => {
 
           <div className="dash-card">
             <h3>Your Stories</h3>
-            <span className="dash-number">{userPosts}</span>
+            <span className="dash-number">{favoritePosts.length}</span>
           </div>
 
           <div className="dash-card">
@@ -118,6 +129,7 @@ const Dashboard = () => {
         <section className="posts-section">
           <div className="section-header">
             <h2 className="section-title">Recent Feed</h2>
+
             <button
               className="create-shortcut-btn"
               onClick={() => navigate("/create-post")}
@@ -184,6 +196,7 @@ const Dashboard = () => {
                     </div>
 
                     <h3 className="post-card-title">{post.title}</h3>
+
                     <p className="post-card-description">
                       {post.description ||
                         post.content ||
